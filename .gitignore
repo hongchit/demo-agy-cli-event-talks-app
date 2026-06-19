@@ -1,0 +1,29 @@
+# Python Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python caching & bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Environments & secrets
+.env
+.flaskenv
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
