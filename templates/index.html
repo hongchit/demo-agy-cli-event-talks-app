@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BigQuery Release Notes Explorer</title>
     <!-- Favicon -->
-    <link rel="icon" href="https://www.gstatic.com/images/branding/product/1x/bigquery_64dp.png" type="image/png">
+    <link rel="icon" href="{{ url_for('static', filename='images/bigquery_logo.jpg') }}" type="image/jpeg">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
     <header class="app-header">
         <div class="header-container">
             <div class="logo-area">
-                <img src="https://www.gstatic.com/images/branding/product/2x/bigquery_64dp.png" alt="BigQuery Logo" class="bq-logo">
+                <img src="{{ url_for('static', filename='images/bigquery_logo.jpg') }}" alt="BigQuery Logo" class="bq-logo">
                 <div class="title-sub">
                     <h1>BigQuery</h1>
                     <p class="subtitle">Release Notes Explorer</p>
