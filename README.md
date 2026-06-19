@@ -17,6 +17,16 @@ This application fetches official BigQuery Release Notes, structures the feed, a
 
 ---
 
+## 📸 Screenshots
+
+### Dark Mode Dashboard
+![BigQuery Release Notes Explorer Dark Mode](docs/screenshots/Screenshot-main-dashboard.png)
+
+### Filtering & Search Demo
+![Filter and Search Features](docs/screenshots/Screenshot-filtered-by-announcement-and-keyword.png)
+
+---
+
 ## 📂 Project Structure
 
 ```text
