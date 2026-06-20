@@ -54,6 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function initTheme() {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
+    const themeCheckbox = document.getElementById('theme-toggle');
+    if (themeCheckbox) {
+        themeCheckbox.checked = (savedTheme === 'light');
+    }
 }
 
 function toggleTheme() {
@@ -61,6 +65,10 @@ function toggleTheme() {
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
+    const themeCheckbox = document.getElementById('theme-toggle');
+    if (themeCheckbox) {
+        themeCheckbox.checked = (newTheme === 'light');
+    }
 }
 
 // Fetch data from API
@@ -482,7 +490,7 @@ function setupEventListeners() {
     // Refresh, export & theme toggle
     refreshBtn.addEventListener('click', () => fetchReleaseNotes(true));
     exportCsvBtn.addEventListener('click', exportToCSV);
-    themeToggle.addEventListener('click', toggleTheme);
+    themeToggle.addEventListener('change', toggleTheme);
     
     // Search event
     searchInput.addEventListener('input', (e) => {

@@ -1067,3 +1067,116 @@ p, li, blockquote {
         padding: 1.5rem;
     }
 }
+
+/* Modern Theme Switch (Pill/Slider Toggle) */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 54px;
+    height: 28px;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.theme-switch-checkbox {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.theme-switch-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .theme-switch-slider {
+    background-color: rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.theme-switch:hover .theme-switch-slider {
+    border-color: var(--border-hover);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+}
+
+.theme-switch-checkbox:focus-visible + .theme-switch-slider {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 2px;
+}
+
+.theme-switch-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+[data-theme="light"] .theme-switch-thumb {
+    background-color: #f5f7fb;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+}
+
+/* Move thumb based on checkbox state */
+.theme-switch-checkbox:checked + .theme-switch-slider .theme-switch-thumb {
+    transform: translateX(26px);
+}
+
+/* Thumb Icons styling */
+.theme-switch-thumb .icon {
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-switch-thumb .switch-sun {
+    color: #f97316;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+}
+
+.theme-switch-thumb .switch-moon {
+    color: #0f172a;
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+/* Light theme overrides for thumb icons */
+[data-theme="light"] .theme-switch-thumb .switch-sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .theme-switch-thumb .switch-moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+}
+
+/* Reduced motion preference override */
+@media (prefers-reduced-motion: reduce) {
+    .theme-switch-slider,
+    .theme-switch-thumb,
+    .theme-switch-thumb .icon {
+        transition: none !important;
+    }
+}
