@@ -557,6 +557,14 @@ p, li, blockquote {
     border-top: 1px solid var(--border-color);
 }
 
+/* Groups Copy + Tweet buttons on the right side of each card footer */
+.card-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+
 .btn-card-action {
     display: inline-flex;
     align-items: center;
@@ -581,6 +589,39 @@ p, li, blockquote {
     color: #1d9bf0;
     background-color: rgba(29, 155, 240, 0.08);
 }
+
+/* Copy-to-clipboard button and its success feedback state */
+.btn-card-action.btn-copy-card:hover {
+    color: var(--text-primary);
+    background-color: var(--input-bg);
+}
+
+.btn-card-action.btn-copy-card.copied {
+    color: var(--color-feature);   /* Green tick confirmation */
+    background-color: var(--color-feature-bg);
+    pointer-events: none;          /* Prevent double-click during feedback window */
+}
+
+/* Animate the icon swap on copy confirmation */
+.btn-copy-card .icon-copy,
+.btn-copy-card .icon-check {
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.btn-copy-card .icon-check {
+    display: none;
+    opacity: 0;
+}
+
+.btn-copy-card.copied .icon-copy {
+    display: none;
+}
+
+.btn-copy-card.copied .icon-check {
+    display: inline;
+    opacity: 1;
+}
+
 
 .icon-twitter {
     width: 16px;

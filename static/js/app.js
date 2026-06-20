@@ -38,6 +38,7 @@ const modalTweetBtn = document.getElementById('modal-tweet-btn');
 const tweetTextArea = document.getElementById('tweet-text-area');
 const charCounter = document.getElementById('char-counter');
 const postTweetBtn = document.getElementById('post-tweet-btn');
+const exportCsvBtn = document.getElementById('export-csv-btn');
 
 // Active note being viewed/shared
 let activeNote = null;
@@ -252,18 +253,36 @@ function renderNotesGrid() {
             <p class="card-excerpt">${excerpt}</p>
             <div class="card-footer">
                 <button class="btn-card-action btn-read-card">Read Details →</button>
-                <button class="btn-card-action btn-tweet-card" title="Share on Twitter" aria-label="Share on Twitter">
-                    <svg class="icon-twitter" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                    <span>Tweet</span>
-                </button>
+                <div class="card-actions-right">
+                    <button class="btn-card-action btn-copy-card" title="Copy to clipboard" aria-label="Copy note to clipboard">
+                        <!-- Clipboard icon (default state) -->
+                        <svg class="icon-copy" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <!-- Checkmark icon (copied state) -->
+                        <svg class="icon-check" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span class="copy-label">Copy</span>
+                    </button>
+                    <button class="btn-card-action btn-tweet-card" title="Share on Twitter" aria-label="Share on Twitter">
+                        <svg class="icon-twitter" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <span>Tweet</span>
+                    </button>
+                </div>
             </div>
         `;
         
-        // Open Detail Modal on card click, excluding the tweet button
+        // Route card clicks: copy → tweet → read details
         card.addEventListener('click', (e) => {
-            if (e.target.closest('.btn-tweet-card')) {
+            if (e.target.closest('.btn-copy-card')) {
+                e.stopPropagation();
+                const btn = e.target.closest('.btn-copy-card');
+                copyToClipboard(note.clean_text, btn);
+            } else if (e.target.closest('.btn-tweet-card')) {
                 e.stopPropagation();
                 openTweetModal(note);
             } else {
@@ -273,6 +292,83 @@ function renderNotesGrid() {
         
         notesGrid.appendChild(card);
     });
+}
+
+// =============================================================================
+// copyToClipboard(text, btn)
+// =============================================================================
+// Uses the modern Clipboard API (navigator.clipboard.writeText) to copy the
+// note's clean_text to the user's clipboard.
+// Provides visual feedback by toggling the .copied CSS class on the button
+// for 2 seconds, swapping the clipboard icon for a green checkmark.
+// Falls back gracefully (no-op) on browsers that deny clipboard permission.
+async function copyToClipboard(text, btn) {
+    try {
+        await navigator.clipboard.writeText(text);
+
+        // Visual feedback: swap icon and label to confirmed state
+        btn.classList.add('copied');
+        const label = btn.querySelector('.copy-label');
+        if (label) label.textContent = 'Copied!';
+
+        // Revert after 2 seconds
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            if (label) label.textContent = 'Copy';
+        }, 2000);
+    } catch (err) {
+        console.warn('Clipboard write failed:', err);
+    }
+}
+
+// =============================================================================
+// exportToCSV()
+// =============================================================================
+// Converts the currently visible (filtered) release notes into a CSV file
+// and triggers a browser download.
+//
+// CSV format:
+//   Columns : Date, Category, Summary, Source Link
+//   Encoding: UTF-8 with BOM (\uFEFF) so Excel opens it correctly
+//   Quoting : All fields are double-quoted; internal quotes are escaped by doubling
+//
+// The filename includes a timestamp so repeated exports don't overwrite each other.
+function exportToCSV() {
+    if (filteredNotes.length === 0) return;
+
+    // Helper: wrap a field value in double-quotes and escape internal quotes
+    const escapeField = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+
+    const headers = ['Date', 'Category', 'Summary', 'Source Link'];
+    const rows = filteredNotes.map(note => [
+        escapeField(note.date),
+        escapeField(note.category),
+        escapeField(note.clean_text),
+        escapeField(note.link)
+    ].join(','));
+
+    // Prepend UTF-8 BOM so Excel auto-detects encoding correctly
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+
+    // Build a timestamped filename: bq-release-notes-2026-06-19.csv
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    const filename  = `bq-release-notes-${dateStamp}.csv`;
+
+    // Create a temporary object URL and click it programmatically
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up: revoke the object URL and remove the temporary anchor
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }, 100);
 }
 
 // Get CSS color value for categories
@@ -383,8 +479,9 @@ function resetFilters() {
 
 // Set up event listeners
 function setupEventListeners() {
-    // Refresh & theme toggle
+    // Refresh, export & theme toggle
     refreshBtn.addEventListener('click', () => fetchReleaseNotes(true));
+    exportCsvBtn.addEventListener('click', exportToCSV);
     themeToggle.addEventListener('click', toggleTheme);
     
     // Search event
